@@ -1,0 +1,12 @@
+FROM php:8.2-fpm
+
+WORKDIR /var/www/web
+
+RUN apt-get update && \
+    apt-get upgrade && \
+    apt-get install sudo && \
+    apt-get install --yes zip unzip
+
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+RUN docker-php-ext-install pdo pdo_mysql

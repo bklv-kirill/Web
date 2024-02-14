@@ -1,0 +1,67 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx-container
+    expose:
+      - 80/tcp
+    ports:
+      - 80:80
+    restart: always
+    volumes:
+      - ./tmp/configs/nginx:/etc/nginx/conf.d:ro
+      - ./src:/var/www/web:ro
+    networks:
+      - web-network
+
+  php:
+    build:
+      context: ./dockerfiles/php
+      dockerfile: dockerfile
+    container_name: php-container
+    restart: always
+    volumes:
+      - ./src:/var/www/web
+    depends_on:
+      - nginx
+    networks:
+      - web-network
+
+  mysql:
+    image: mysql
+    container_name: mysql-container
+    expose:
+      - 3306/tcp
+    ports:
+      - 3306:3306
+    restart: always
+    volumes:
+      - ./databases/mysql:/var/lib/mysql
+    env_file:
+      - mysql.env
+    depends_on:
+      - nginx
+    networks:
+      - web-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin-container
+    expose:
+      - 80/tcp
+    ports:
+      - 8080:80
+    restart: always
+    env_file:
+      - phpmyadmin.env
+    depends_on:
+      - nginx
+      - mysql
+    networks:
+      - web-network
+
+networks:
+  web-network:
+    name: web-network
+    driver: bridge
