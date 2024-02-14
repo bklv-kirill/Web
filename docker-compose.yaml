@@ -28,6 +28,16 @@ services:
     networks:
       - web-network
 
+  composer:
+    build:
+      context: ./dockerfiles/composer
+      dockerfile: dockerfile
+    container_name: composer
+    volumes:
+      - ./src:/var/composer/src
+    networks:
+      - web-network
+
   mysql:
     image: mysql
     container_name: mysql-container
